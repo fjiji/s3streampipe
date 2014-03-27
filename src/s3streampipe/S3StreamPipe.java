@@ -15,30 +15,33 @@ public class S3StreamPipe extends TimerTask {
 	public void addLine(String str) {
 		lineBuf.add(str);
 	}
-
-	private final String bucketName;
 	
-	S3StreamPipe(String bucketname) {
-		this.bucketName = bucketname;
+	private final FileDumper dumper;
+	
+	S3StreamPipe(FileDumper dumper) {
+		this.dumper = dumper;
 	}
 	
 	public void run() {
-		System.out.println(">>>test fengji!!!");
+		//System.out.println(">>>test fengji!!!");
 		String str;
 		StringBuilder builder = new StringBuilder();
 		while ((str = lineBuf.poll()) != null) {
 			builder.append(str);
 			builder.append("\n");
 		}
-		if (builder.length() != 0) {
-			System.out.println("fengji test: " + builder.toString());
+		String content = builder.toString();
+		if (content.length() != 0) {
+			System.out.println("fengji test: " + content);
+			dumper.dump(content.getBytes());
 		}
-		System.out.println("<<<test fengji!!!");
+		//System.out.println("<<<test fengji!!!");
 	}
 	
 	public static void main(String[] args) {
 		String bucketName = args[0];
-		S3StreamPipe pipe = new S3StreamPipe(bucketName);
+		FileDumper dumper = new FileDumper(bucketName);
+		S3StreamPipe pipe = new S3StreamPipe(dumper);
 		
 		Timer timer = new Timer();
 		timer.schedule(pipe, 2000, 2000); // 2 seconds delay and 2 second period
