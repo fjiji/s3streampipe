@@ -64,7 +64,6 @@ public class AOFReloader {
 	
 	private static void fetchAndAppend(String bucketName, String obj, String AOFfile) {
 		String command = S3CURL + " --id=vblob -- http://10.145.131.78:9070/" + bucketName + "/" + obj;
-		System.out.println("going to exec " + command);
 		
 		File file =new File(AOFfile);
 		 
