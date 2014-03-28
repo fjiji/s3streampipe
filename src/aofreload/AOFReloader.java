@@ -24,7 +24,8 @@ public class AOFReloader {
 	}
 	
 	private static String listBucket(String bucket) {
-		String command = S3CURL + " --id=vblob -- http://10.145.131.78:9070/" + bucket;
+		String command = S3CURL + " --id=vblob -- http://10.145.131.78:9070/" + bucket
+				+ "?prefix=AOF";
 		
 		try {
 			Process p = Runtime.getRuntime().exec(command);

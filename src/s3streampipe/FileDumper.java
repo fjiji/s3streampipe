@@ -40,7 +40,7 @@ public class FileDumper {
 	
 	private String generateFileName() {
 		long current = System.currentTimeMillis();
-		return (bucketName + Long.toString(current));
+		return ("AOF" + bucketName + Long.toString(current));
 	}
 	
 	private void writeToLocalFile(String filename, byte[] content) {
