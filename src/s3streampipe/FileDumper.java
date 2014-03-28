@@ -5,13 +5,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class FileDumper {
-	final public static String S3CURL = "/home/fji/Downloads/s3-curl/s3curl.pl --id=vblob ";
+	private String s3curl_cmd;
 	final public static String SERVER = "http://10.145.131.78:9070/";
 	
 	final String bucketName;
 	
-	FileDumper(String bucketName) {
+	FileDumper(String bucketName, String s3curl) {
 		this.bucketName = bucketName;
+		this.s3curl_cmd = s3curl;
 	}
 	
 	void dump(byte[] content) {
@@ -21,13 +22,14 @@ public class FileDumper {
 		
 		//invoke s3curl
 		StringBuilder commandBuilder = new StringBuilder();
-		commandBuilder.append(S3CURL);
-		commandBuilder.append(" --put ");
+		commandBuilder.append(s3curl_cmd);
+		commandBuilder.append(" --id=vblob  --put ");
 		commandBuilder.append(path);
 		commandBuilder.append(" -- ");
 		commandBuilder.append(SERVER);
 		commandBuilder.append(bucketName).append("/");
 		commandBuilder.append(fileName);
+		System.out.println("going to exec: " + commandBuilder.toString());
 		
 		try {
 			Process p = Runtime.getRuntime().exec(commandBuilder.toString());

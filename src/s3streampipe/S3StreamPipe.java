@@ -1,8 +1,11 @@
 package s3streampipe;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Properties;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -39,31 +42,45 @@ public class S3StreamPipe extends TimerTask {
 	}
 	
 	public static void main(String[] args) {
-		String bucketName = args[0];
-		FileDumper dumper = new FileDumper(bucketName);
-		S3StreamPipe pipe = new S3StreamPipe(dumper);
+		FileInputStream configInput;
+		try {
+			configInput = new FileInputStream("resource/config.properties");
+			Properties prop = new Properties();
+			prop.load(configInput);
 		
-		Timer timer = new Timer();
-		timer.schedule(pipe, 2000, 2000); // 2 seconds delay and 2 second period
 		
-		/* the main loop to stream input into the lineBuf buffer */
-		while (true) {
-			
-			try (BufferedReader br = new BufferedReader(new InputStreamReader(
-					System.in))) {
-				
-				while (true) {
-					String line = br.readLine();
-					if (line != null) {
-						
-						pipe.addLine(line);
+			String bucketName = args[0];
+			FileDumper dumper = new FileDumper(bucketName,
+					prop.getProperty("s3curl"));
+			S3StreamPipe pipe = new S3StreamPipe(dumper);
+
+			Timer timer = new Timer();
+			timer.schedule(pipe, 2000, 2000); // 2 seconds delay and 2 second
+												// period
+
+			/* the main loop to stream input into the lineBuf buffer */
+			while (true) {
+
+				try (BufferedReader br = new BufferedReader(
+						new InputStreamReader(System.in))) {
+
+					while (true) {
+						String line = br.readLine();
+						if (line != null) {
+
+							pipe.addLine(line);
+						}
 					}
+
+				} catch (IOException e) {
+					System.out.print("Unexpected IOException ");
+					e.printStackTrace();
 				}
-				
-			} catch (IOException e) {
-				System.out.print("Unexpected IOException ");
-				e.printStackTrace();
 			}
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(-1);
 		}
 	}
 

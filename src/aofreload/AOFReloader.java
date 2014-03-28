@@ -2,29 +2,45 @@ package aofreload;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class AOFReloader {
-	final public static String S3CURL = "/home/fji/Downloads/s3-curl/s3curl.pl --id=vblob ";
+	private static String s3curl;
 	final public static String SERVER = "http://10.145.131.78:9070/";
 
 	public static void main(String[] args) {
-		String bucketName = args[0];
-		String AOFfile = args[1];
+		FileInputStream configInput;
+		try {
+			configInput = new FileInputStream("resource/config.properties");
+			Properties prop = new Properties();
+			prop.load(configInput);
+			
+			s3curl = prop.getProperty("s3curl") + " --id=vblob ";
+
+			String bucketName = args[0];
+			String AOFfile = args[1];
+
+			String listRes = listBucket(bucketName);
+
+			List<String> files = findFiles(listRes);
+
+			for (String file : files) {
+				fetchAndAppend(bucketName, file, AOFfile);
+			}
 		
-		String listRes = listBucket(bucketName);
-		
-		List<String> files = findFiles(listRes);
-		
-		for (String file: files) {
-			fetchAndAppend(bucketName, file, AOFfile);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(-1);
 		}
+		
 	}
 	
 	private static String listBucket(String bucket) {
-		String command = S3CURL + " --id=vblob -- http://10.145.131.78:9070/" + bucket
+		String command = s3curl + " --id=vblob -- http://10.145.131.78:9070/" + bucket
 				+ "?prefix=AOF";
 		
 		try {
@@ -64,7 +80,7 @@ public class AOFReloader {
 	}
 	
 	private static void fetchAndAppend(String bucketName, String obj, String AOFfile) {
-		String command = S3CURL + " --id=vblob -- http://10.145.131.78:9070/" + bucketName + "/" + obj;
+		String command = s3curl + " --id=vblob -- http://10.145.131.78:9070/" + bucketName + "/" + obj;
 		
 		File file =new File(AOFfile);
 		 
