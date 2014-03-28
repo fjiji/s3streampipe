@@ -9,9 +9,11 @@ public class FileDumper {
 	final public static String SERVER = "http://10.145.131.78:9070/";
 	
 	final String bucketName;
+	final String sessionId;
 	
-	FileDumper(String bucketName, String s3curl) {
+	FileDumper(String bucketName, String sessionId, String s3curl) {
 		this.bucketName = bucketName;
+		this.sessionId = sessionId;
 		this.s3curl_cmd = s3curl;
 	}
 	
@@ -42,7 +44,7 @@ public class FileDumper {
 	
 	private String generateFileName() {
 		long current = System.currentTimeMillis();
-		return ("AOF" + bucketName + Long.toString(current));
+		return ("AOF" + "-" + sessionId + "-" + Long.toString(current));
 	}
 	
 	private void writeToLocalFile(String filename, byte[] content) {

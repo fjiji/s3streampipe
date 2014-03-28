@@ -22,9 +22,10 @@ public class AOFReloader {
 			s3curl = prop.getProperty("s3curl") + " --id=vblob ";
 
 			String bucketName = args[0];
-			String AOFfile = args[1];
+			String sessionId = args[1];
+			String AOFfile = args[2];
 
-			String listRes = listBucket(bucketName);
+			String listRes = listBucket(bucketName, sessionId);
 
 			List<String> files = findFiles(listRes);
 
@@ -39,9 +40,9 @@ public class AOFReloader {
 		
 	}
 	
-	private static String listBucket(String bucket) {
+	private static String listBucket(String bucket, String sessionId) {
 		String command = s3curl + " --id=vblob -- http://10.145.131.78:9070/" + bucket
-				+ "?prefix=AOF";
+				+ "?prefix=AOF-" + sessionId;
 		
 		try {
 			Process p = Runtime.getRuntime().exec(command);

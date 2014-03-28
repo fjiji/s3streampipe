@@ -50,7 +50,8 @@ public class S3StreamPipe extends TimerTask {
 		
 		
 			String bucketName = args[0];
-			FileDumper dumper = new FileDumper(bucketName,
+			String sessionId = args[1];
+			FileDumper dumper = new FileDumper(bucketName, sessionId,
 					prop.getProperty("s3curl"));
 			S3StreamPipe pipe = new S3StreamPipe(dumper);
 
