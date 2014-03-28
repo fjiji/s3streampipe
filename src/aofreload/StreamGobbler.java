@@ -33,7 +33,7 @@ class StreamGobbler extends Thread
 			String line = null;
 			while ((line = br.readLine()) != null) {
 				bufferWritter.write(line);
-				bufferWritter.write("\n");
+				bufferWritter.write("\r\n");
 				//System.out.println(type + ">" + line);
 			}
 			
